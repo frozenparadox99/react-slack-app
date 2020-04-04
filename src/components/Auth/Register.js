@@ -89,7 +89,7 @@ class Register extends Component {
             .then(() => {
               this.saveUser(createdUser).then(() => {
                 console.log("User Saved");
-                this.setState({ loading: false });
+                // this.setState({ loading: false });
               });
             })
             .catch((err) => {
@@ -138,7 +138,7 @@ class Register extends Component {
     return (
       <Grid textAlign="center" verticalAlign="middle" className="app">
         <Grid.Column style={{ maxWidth: 450 }}>
-          <Header as="h2" icon color="orange" textAlign="center">
+          <Header as="h1" icon color="orange" textAlign="center">
             <Icon name="puzzle piece" color="orange" />
             Register for DevChat
           </Header>
