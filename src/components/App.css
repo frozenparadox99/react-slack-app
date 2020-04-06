@@ -10,6 +10,9 @@ body,
   height: 440px;
   overflow-y: scroll;
 }
+.messages::-webkit-scrollbar {
+  display: none;
+}
 
 .message__form {
   position: fixed !important;
@@ -18,4 +21,13 @@ body,
   left: 0;
   right: 1em;
   z-index: 200;
+}
+
+.message__self {
+  border-left: 2px solid orange;
+  padding-left: 8px;
+}
+
+.message__image {
+  padding: 1em;
 }
