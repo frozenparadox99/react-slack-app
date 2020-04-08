@@ -181,6 +181,7 @@ class MessageForm extends Component {
           <Button
             color="teal"
             onClick={this.openModal}
+            disabled={uploadState === "uploading"}
             content="Upload Media"
             labelPosition="right"
             icon="cloud upload"
