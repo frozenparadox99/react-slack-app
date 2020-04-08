@@ -7,6 +7,8 @@ import Message from "./Message";
 
 class Messages extends Component {
   state = {
+    privateChannel: this.props.isPrivateChannel,
+    privateMessagesRef: firebase.database().ref("privateMessages"),
     messagesRef: firebase.database().ref("messages"),
     messages: [],
     channel: this.props.currentChannel,
@@ -32,7 +34,8 @@ class Messages extends Component {
 
   addMessageListener = (channelId) => {
     let loadedMessages = [];
-    this.state.messagesRef.child(channelId).on("child_added", (snap) => {
+    const ref = this.getMessagesRef();
+    ref.child(channelId).on("child_added", (snap) => {
       loadedMessages.push(snap.val());
       this.setState({
         messages: loadedMessages,
@@ -40,6 +43,11 @@ class Messages extends Component {
       });
       this.countUniqueUsers(loadedMessages);
     });
+  };
+
+  getMessagesRef = () => {
+    const { messagesRef, privateMessagesRef, privateChannel } = this.state;
+    return privateChannel ? privateMessagesRef : messagesRef;
   };
 
   handleSearchChange = (event) => {
@@ -97,6 +105,7 @@ class Messages extends Component {
 
   render() {
     const {
+      privateChannel,
       messagesRef,
       channel,
       user,
@@ -113,6 +122,8 @@ class Messages extends Component {
           numUniqueUsers={numUniqueUsers}
           channelName={this.displayChannelName(channel)}
           handleSearchChange={this.handleSearchChange}
+          isPrivateChannel={privateChannel}
+          searchLoading={searchLoading}
         />
 
         <Segment>
@@ -126,6 +137,8 @@ class Messages extends Component {
           messagesRef={messagesRef}
           currentUser={user}
           currentChannel={channel}
+          isPrivateChannel={privateChannel}
+          getMessagesRef={this.getMessagesRef}
         />
       </Fragment>
     );
