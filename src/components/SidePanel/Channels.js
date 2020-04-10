@@ -1,29 +1,23 @@
-import React, { Component, Fragment } from "react";
+import React from "react";
 import firebase from "../../firebase";
 import { connect } from "react-redux";
-import {
-  Menu,
-  Icon,
-  Modal,
-  Form,
-  Input,
-  Button,
-  Label,
-} from "semantic-ui-react";
 import { setCurrentChannel, setPrivateChannel } from "../../actions";
+// prettier-ignore
+import { Menu, Icon, Modal, Form, Input, Button, Label } from "semantic-ui-react";
 
-class Channels extends Component {
+class Channels extends React.Component {
   state = {
     activeChannel: "",
+    user: this.props.currentUser,
     channel: null,
     channels: [],
-    user: this.props.currentUser,
-    modal: false,
     channelName: "",
     channelDetails: "",
     channelsRef: firebase.database().ref("channels"),
     messagesRef: firebase.database().ref("messages"),
+    typingRef: firebase.database().ref("typing"),
     notifications: [],
+    modal: false,
     firstLoad: true,
   };
 
@@ -87,6 +81,9 @@ class Channels extends Component {
 
   removeListeners = () => {
     this.state.channelsRef.off();
+    this.state.channels.forEach((channel) => {
+      this.state.messagesRef.child(channel.id).off();
+    });
   };
 
   setFirstChannel = () => {
@@ -96,20 +93,12 @@ class Channels extends Component {
       this.setActiveChannel(firstChannel);
       this.setState({ channel: firstChannel });
     }
-
     this.setState({ firstLoad: false });
   };
 
-  openModal = () => this.setState({ modal: true });
-
-  closeModal = () => this.setState({ modal: false });
-
-  handleChange = (event) => {
-    this.setState({ [event.target.name]: event.target.value });
-  };
-
   addChannel = () => {
-    const { channelsRef, channelDetails, channelName, user } = this.state;
+    const { channelsRef, channelName, channelDetails, user } = this.state;
+
     const key = channelsRef.push().key;
 
     const newChannel = {
@@ -121,6 +110,7 @@ class Channels extends Component {
         avatar: user.photoURL,
       },
     };
+
     channelsRef
       .child(key)
       .update(newChannel)
@@ -134,11 +124,25 @@ class Channels extends Component {
       });
   };
 
+  handleSubmit = (event) => {
+    event.preventDefault();
+    if (this.isFormValid(this.state)) {
+      this.addChannel();
+    }
+  };
+
+  handleChange = (event) => {
+    this.setState({ [event.target.name]: event.target.value });
+  };
+
   changeChannel = (channel) => {
     this.setActiveChannel(channel);
+    this.state.typingRef
+      .child(this.state.channel.id)
+      .child(this.state.user.uid)
+      .remove();
     this.clearNotifications();
     this.props.setCurrentChannel(channel);
-
     this.props.setPrivateChannel(false);
     this.setState({ channel });
   };
@@ -191,20 +195,18 @@ class Channels extends Component {
       </Menu.Item>
     ));
 
-  handleSubmit = (event) => {
-    event.preventDefault();
-    if (this.isFormValid(this.state)) {
-      this.addChannel();
-    }
-  };
-
   isFormValid = ({ channelName, channelDetails }) =>
     channelName && channelDetails;
 
+  openModal = () => this.setState({ modal: true });
+
+  closeModal = () => this.setState({ modal: false });
+
   render() {
     const { channels, modal } = this.state;
+
     return (
-      <Fragment>
+      <React.Fragment>
         <Menu.Menu className="menu">
           <Menu.Item>
             <span>
@@ -215,6 +217,7 @@ class Channels extends Component {
           {this.displayChannels(channels)}
         </Menu.Menu>
 
+        {/* Add Channel Modal */}
         <Modal basic open={modal} onClose={this.closeModal}>
           <Modal.Header>Add a Channel</Modal.Header>
           <Modal.Content>
@@ -248,7 +251,7 @@ class Channels extends Component {
             </Button>
           </Modal.Actions>
         </Modal>
-      </Fragment>
+      </React.Fragment>
     );
   }
 }

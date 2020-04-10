@@ -1,7 +1,6 @@
-import React, { Component } from "react";
+import React from "react";
 import firebase from "../../firebase";
 import md5 from "md5";
-
 import {
   Grid,
   Form,
@@ -11,10 +10,9 @@ import {
   Message,
   Icon,
 } from "semantic-ui-react";
-
 import { Link } from "react-router-dom";
 
-class Register extends Component {
+class Register extends React.Component {
   state = {
     username: "",
     email: "",
@@ -52,7 +50,7 @@ class Register extends Component {
   };
 
   isPasswordValid = ({ password, passwordConfirmation }) => {
-    if (password.length < 5 || passwordConfirmation.length < 5) {
+    if (password.length < 6 || passwordConfirmation.length < 6) {
       return false;
     } else if (password !== passwordConfirmation) {
       return false;
@@ -65,9 +63,7 @@ class Register extends Component {
     errors.map((error, i) => <p key={i}>{error.message}</p>);
 
   handleChange = (event) => {
-    this.setState({
-      [event.target.name]: event.target.value,
-    });
+    this.setState({ [event.target.name]: event.target.value });
   };
 
   handleSubmit = (event) => {
@@ -88,8 +84,7 @@ class Register extends Component {
             })
             .then(() => {
               this.saveUser(createdUser).then(() => {
-                console.log("User Saved");
-                // this.setState({ loading: false });
+                console.log("user saved");
               });
             })
             .catch((err) => {
@@ -154,6 +149,7 @@ class Register extends Component {
                 value={username}
                 type="text"
               />
+
               <Form.Input
                 fluid
                 name="email"
@@ -165,6 +161,7 @@ class Register extends Component {
                 className={this.handleInputError(errors, "email")}
                 type="email"
               />
+
               <Form.Input
                 fluid
                 name="password"
@@ -176,6 +173,7 @@ class Register extends Component {
                 className={this.handleInputError(errors, "password")}
                 type="password"
               />
+
               <Form.Input
                 fluid
                 name="passwordConfirmation"
@@ -187,6 +185,7 @@ class Register extends Component {
                 className={this.handleInputError(errors, "password")}
                 type="password"
               />
+
               <Button
                 disabled={loading}
                 className={loading ? "loading" : ""}
@@ -205,7 +204,7 @@ class Register extends Component {
             </Message>
           )}
           <Message>
-            Already a user? <Link to="/login">Login</Link>{" "}
+            Already a user? <Link to="/login">Login</Link>
           </Message>
         </Grid.Column>
       </Grid>
