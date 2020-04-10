@@ -1,20 +1,22 @@
-import React, { Component, Fragment } from "react";
-import firebase from "../../firebase";
+import React from "react";
 import { Segment, Comment } from "semantic-ui-react";
+import firebase from "../../firebase";
+
 import MessagesHeader from "./MessagesHeader";
 import MessageForm from "./MessageForm";
 import Message from "./Message";
 
-class Messages extends Component {
+class Messages extends React.Component {
   state = {
     privateChannel: this.props.isPrivateChannel,
     privateMessagesRef: firebase.database().ref("privateMessages"),
     messagesRef: firebase.database().ref("messages"),
     messages: [],
-    isChannelStarred: false,
-    channel: this.props.currentChannel,
-    user: this.props.currentUser,
     messagesLoading: true,
+    channel: this.props.currentChannel,
+    isChannelStarred: false,
+    user: this.props.currentUser,
+    usersRef: firebase.database().ref("users"),
     numUniqueUsers: "",
     searchTerm: "",
     searchLoading: false,
@@ -108,6 +110,7 @@ class Messages extends Component {
       () => this.handleSearchMessages()
     );
   };
+
   handleSearchMessages = () => {
     const channelMessages = [...this.state.messages];
     const regex = new RegExp(this.state.searchTerm, "gi");
@@ -153,27 +156,17 @@ class Messages extends Component {
   };
 
   render() {
-    const {
-      privateChannel,
-      messagesRef,
-      channel,
-      user,
-      messages,
-      messagesLoading,
-      numUniqueUsers,
-      searchTerm,
-      searchLoading,
-      searchResults,
-      isChannelStarred,
-    } = this.state;
+    // prettier-ignore
+    const { messagesRef, messages, channel, user, numUniqueUsers, searchTerm, searchResults, searchLoading, privateChannel, isChannelStarred } = this.state;
+
     return (
-      <Fragment>
+      <React.Fragment>
         <MessagesHeader
-          numUniqueUsers={numUniqueUsers}
           channelName={this.displayChannelName(channel)}
+          numUniqueUsers={numUniqueUsers}
           handleSearchChange={this.handleSearchChange}
-          isPrivateChannel={privateChannel}
           searchLoading={searchLoading}
+          isPrivateChannel={privateChannel}
           handleStar={this.handleStar}
           isChannelStarred={isChannelStarred}
         />
@@ -185,14 +178,15 @@ class Messages extends Component {
               : this.displayMessages(messages)}
           </Comment.Group>
         </Segment>
+
         <MessageForm
           messagesRef={messagesRef}
-          currentUser={user}
           currentChannel={channel}
+          currentUser={user}
           isPrivateChannel={privateChannel}
           getMessagesRef={this.getMessagesRef}
         />
-      </Fragment>
+      </React.Fragment>
     );
   }
 }
